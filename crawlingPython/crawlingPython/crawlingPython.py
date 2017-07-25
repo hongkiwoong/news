@@ -23,14 +23,21 @@ def get_link_from_news_title(page_num, URL):
             #기사 헤드라인 
             title_link = str(title.select('a'))
             read_headline1= str(title_link[str(title_link).find('>')+1:str(title_link).find('<',str(title_link).find('>')+1)])
-            title_length = title_link.find('<',str(title_link).find('>')+1)
-            if title_link.find('<span class') is not -1 :
-                read_headline2 = str(title_link[str(title_link).find('light">')+7:str(title_link).find('</span>')])
-                read_headline3 = str(title_link[str(title_link).find('</span>')+7:str(title_link).find('</a>')])
-                read_headline = read_headline1+read_headline2+read_headline3
-                print (read_headline)   #삼성 highlight를 제거한 헤드라인
-            else:
-                print (read_headline1)
+            index = title_link.find('<a')
+            while 1:
+                if title_link.find('<span class',index) is not -1:
+                     read_headline1 += str(title_link[str(title_link).find('light">',index)+7:str(title_link).find('</span>',index)])
+                     index = title_link.find('</span>',index)
+                     if title_link.find('<span',index) is not -1:
+                         read_headline1 += str(title_link[title_link.find('</span>',index)+7:str(title_link).find('<span',index)])
+                         index = title_link.find('<span class',index)
+                         continue
+                     else:
+                         read_headline1 += str(title_link[str(title_link).find('</span>',index)+7:str(title_link).find('</a>',index)])
+                         break
+                else:
+                    break
+            print (read_headline1)
             
 
             # 기사 시간, 날짜 
@@ -76,9 +83,23 @@ def get_link_from_news_title(page_num, URL):
 
         for title_contents in soup.find_all('p', 'txt'):
             contents_txt = str(title_contents.select('a'))
-            contents = str(contents_txt[str(contents_txt).find('blank">')+7:str(contents_txt).find('</a>')])
+            contents1 = str(contents_txt[str(contents_txt).find('blank">')+7:str(contents_txt).find('<',str(contents_txt).find('blank">'))])
+            index = contents_txt.find('<a')
+            while 1:
+                if contents_txt.find('<span class',index) is not -1:
+                     contents1 += str(contents_txt[str(contents_txt).find('light">',index)+7:str(contents_txt).find('</span>',index)])
+                     index = contents_txt.find('</span>',index)
+                     if contents_txt.find('<span',index) is not -1:
+                         contents1 += str(contents_txt[contents_txt.find('</span>',index)+7:str(contents_txt).find('<span',index)])
+                         index = contents_txt.find('<span class',index)
+                         continue
+                     else:
+                         contents1 += str(contents_txt[str(contents_txt).find('</span>',index)+7:str(contents_txt).find('</a>',index)])
+                         break
+                else:
+                    break
 
-            print (contents)
+            print (contents1)
             
 
 
