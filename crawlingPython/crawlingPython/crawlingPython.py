@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import urllib.request
 from urllib.parse import quote
+import html
  
 TARGET_URL_BEFORE_PAGE_NUM = "http://news.donga.com/search?p="
 TARGET_URL_BEFORE_KEWORD = '&query='
@@ -15,16 +16,72 @@ def get_link_from_news_title(page_num, URL):
         URL_with_page_num = URL[: position+1] + str(current_page_num) + URL[position+1 :]
         source_code_from_URL = urllib.request.urlopen(URL_with_page_num)
         soup = BeautifulSoup(source_code_from_URL, 'html.parser',from_encoding='utf-8')
+
+
         for title in soup.find_all('p', 'tit'):
+
+            #기사 헤드라인 
             title_link = str(title.select('a'))
-            print (title_link[str(title_link).find('>')+1:str(title_link).find('<',str(title_link).find('>')+1)])
+            read_headline1= str(title_link[str(title_link).find('>')+1:str(title_link).find('<',str(title_link).find('>')+1)])
             title_length = title_link.find('<',str(title_link).find('>')+1)
             if title_link.find('<span class') is not -1 :
-                 print (title_link[str(title_link).find('light">')+7:str(title_link).find('</span>')])
-                 print (title_link[str(title_link).find('</span>')+7:str(title_link).find('</a>')])
+                read_headline2 = str(title_link[str(title_link).find('light">')+7:str(title_link).find('</span>')])
+                read_headline3 = str(title_link[str(title_link).find('</span>')+7:str(title_link).find('</a>')])
+                read_headline = read_headline1+read_headline2+read_headline3
+                print (read_headline)   #삼성 highlight를 제거한 헤드라인
+            else:
+                print (read_headline1)
+            
 
+            # 기사 시간, 날짜 
+            title_time = str(title.select('span'))
+            if title_time.find('<span class') is not -1:
+                date_time = title_time.split('</span>')
+                check=1;
+            else:
+                date_time = str(title_time[title_time.find('<span>')+6:title_time.find('</span>')])
+                split_date_time = date_time.split(' ')
+                loop_check=0;
+                for loop in split_date_time:
+                    if loop_check is 0:
+                        date = loop
+                        loop_check =1
+                    else:
+                        time = loop
+                print (date)  # 날짜
+                print (time)  # 시간
+                check =2
+            for s in date_time:
+                if check is 1:
+                    check =3
+                elif check is 2:
+                    break
+                else:
+                    n_date_time = s
+                    date_time_str = str(n_date_time[str(n_date_time).find('<span>')+6:])
+                    split_date_time_n = date_time_str.split(' ')
+                    loop_check=0;
+                    for loop in split_date_time_n:
+                        if loop_check is 0:
+                            date = loop
+                            loop_check =1
+                        else:
+                            time = loop
+                    print (date)  # 날짜
+                    print (time)  # 시간
+                    break
+
+          
+        # 기사 요약 내용 가져오기   
+
+        for title_contents in soup.find_all('p', 'txt'):
+            contents_txt = str(title_contents.select('a'))
+            contents = str(contents_txt[str(contents_txt).find('blank">')+7:str(contents_txt).find('</a>')])
+
+            print (contents)
             
-            
+
+
  
 # 기사 본문 내용 긁어오기 (위 함수 내부에서 기사 본문 주소 받아 사용되는 함수)
 def get_text(URL):
@@ -37,7 +94,7 @@ def get_text(URL):
  
 # 메인함수
 def main():   
-    keyword = '사드'
+    keyword = '삼성'
     page_num =3
     target_URL = TARGET_URL_BEFORE_PAGE_NUM + TARGET_URL_BEFORE_KEWORD \
                  + quote(keyword) + TARGET_URL_REST
