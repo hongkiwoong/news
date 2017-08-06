@@ -115,7 +115,7 @@ def get_text(URL):
  
 # 메인함수
 def main():   
-    keyword = '삼성'
+    keyword = 'LG'
     page_num =3
     target_URL = TARGET_URL_BEFORE_PAGE_NUM + TARGET_URL_BEFORE_KEWORD \
                  + quote(keyword) + TARGET_URL_REST
